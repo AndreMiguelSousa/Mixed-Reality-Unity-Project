@@ -9,7 +9,6 @@ public class BuildingSelector : MonoBehaviour
     private Vector3 originalPosition;
     private LayerMask originalLayerMask;
     private bool isMoving = false;
-    public Material validMat, invalidMat; // materials for feedback
 
     void Update()
     {
