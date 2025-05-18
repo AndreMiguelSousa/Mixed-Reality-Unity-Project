@@ -9,6 +9,8 @@ public class BuildingSelector : MonoBehaviour
     private Vector3 originalPosition;
     private LayerMask originalLayerMask;
     private bool isMoving = false;
+    private Material originalMaterial;
+    private Color originalColor;
 
     void Update()
     {
@@ -77,14 +79,36 @@ public class BuildingSelector : MonoBehaviour
 
     void SelectBuilding(GameObject building)
     {
+        // Prevent buildings not restoring colour when selecting a building while another one is selected
+        Deselect();
+
         selectedBuilding = building;
         originalPosition = building.transform.position;
         originalLayerMask = building.layer;
+
+        // Change colour slightly so as to provide a sort of visual indicator that the building is selected
+        Renderer rend = building.GetComponent<Renderer>();
+        if (rend != null)
+        {
+            originalMaterial = rend.material;
+            originalColor = rend.material.color;
+            rend.material.color = originalColor * 0.7f; // darken it a bit
+        }
+
         buildingOptionsPanel.SetActive(true);
     }
 
     public void Deselect()
     {
+        if (selectedBuilding != null)
+        {
+            Renderer rend = selectedBuilding.GetComponent<Renderer>();
+            if (rend != null && originalMaterial != null)
+            {
+                rend.material.color = originalColor; // restore original colour
+            }
+        }
+
         selectedBuilding = null;
         buildingOptionsPanel.SetActive(false);
     }

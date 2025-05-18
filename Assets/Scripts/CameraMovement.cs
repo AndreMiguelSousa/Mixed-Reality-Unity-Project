@@ -2,69 +2,72 @@ using UnityEngine;
 
 public class CameraMovement : MonoBehaviour
 {
-    public float moveSpeed = 20f;
-    public float zoomSpeed = 200f;
-    public float rotationSpeed = 100f;
+    [Header("Movement Settings")]
+    public float moveSpeed = 10f;
+    public float zoomSpeed = 20f;
+    public float rotationSpeed = 3f;
+    public float pitchMin = 20f;
+    public float pitchMax = 80f;
 
-    public float minY = 10f;
-    public float maxY = 100f;
+    [Header("Clamp Settings")]
+    public float minX = -12f;
+    public float maxX = 12f;
+    public float minZ = -12f;
+    public float maxZ = 12f;
+    public float minY = 0.5f;
+    public float maxY = 10f;
 
-    public Vector2 xLimits = new Vector2(-50, 50);
-    public Vector2 zLimits = new Vector2(-50, 50);
+    private float pitch = 45f;
+    private float yaw = 0f;
 
+    void Start()
+    {
+        Vector3 angles = transform.eulerAngles;
+        pitch = angles.x;
+        yaw = angles.y;
+    }
 
     void Update()
     {
-        HandleMovement();
-        HandleZoom();
-        HandleRotation();
-        ClampPosition();
-    }
+        // Movement
+        float horizontal = Input.GetAxisRaw("Horizontal");
+        float vertical = Input.GetAxisRaw("Vertical");
 
-    void HandleMovement()
-    {
-        Vector3 dir = Vector3.zero;
+        // Vertical Movement
+        float verticalUpDown = 0f;
+        if (Input.GetKey(KeyCode.Space)) verticalUpDown += 1f;
+        if (Input.GetKey(KeyCode.LeftShift)) verticalUpDown -= 1f;
 
-        if (Input.GetKey(KeyCode.W))
-            dir += transform.forward;
-        if (Input.GetKey(KeyCode.S))
-            dir -= transform.forward;
-        if (Input.GetKey(KeyCode.D))
-            dir += transform.right;
-        if (Input.GetKey(KeyCode.A))
-            dir -= transform.right;
-        if (Input.GetKey(KeyCode.Space))
-            dir += transform.up;
-        if (Input.GetKey(KeyCode.LeftShift))
-            dir -= transform.up;
-        dir.y = 0f;
-        transform.position += dir.normalized * moveSpeed * Time.deltaTime;
-    }
+        Vector3 forward = transform.forward;
+        Vector3 right = transform.right;
+        Vector3 up = Vector3.up;
 
-    void HandleZoom()
-    {
-        float scroll = Input.GetAxis("Mouse ScrollWheel");
-        Vector3 pos = transform.position;
-        pos.y -= scroll * zoomSpeed * Time.deltaTime;
-        pos.y = Mathf.Clamp(pos.y, minY, maxY);
-        transform.position = pos;
-    }
+        forward.y = 0;
+        right.y = 0;
+        forward.Normalize();
+        right.Normalize();
 
-    void HandleRotation()
-    {
-        if (Input.GetMouseButton(1)) // Right mouse button
+        Vector3 direction = (forward * vertical + right * horizontal + up * verticalUpDown).normalized;
+        transform.position += direction * moveSpeed * Time.deltaTime;
+
+        // Mouse Rotation
+        if (Input.GetMouseButton(1))
         {
-            float Xrotate = Input.GetAxis("Mouse X") * rotationSpeed * Time.deltaTime;
-            float Yrotate = Input.GetAxis("Mouse Y") * rotationSpeed * Time.deltaTime;
-            transform.Rotate(Yrotate, Xrotate, 0f, Space.World);
-        }
-    }
+            float mouseX = Input.GetAxisRaw("Mouse X");
+            float mouseY = Input.GetAxisRaw("Mouse Y");
 
-    void ClampPosition()
-    {
+            yaw += mouseX * rotationSpeed;
+            pitch -= mouseY * rotationSpeed;
+            pitch = Mathf.Clamp(pitch, pitchMin, pitchMax);
+
+            transform.rotation = Quaternion.Euler(pitch, yaw, 0f);
+        }
+
+        // Limit the camera position to city bounds
         Vector3 pos = transform.position;
-        pos.x = Mathf.Clamp(pos.x, xLimits.x, xLimits.y);
-        pos.z = Mathf.Clamp(pos.z, zLimits.x, zLimits.y);
+        pos.x = Mathf.Clamp(pos.x, minX, maxX);
+        pos.y = Mathf.Clamp(pos.y, minY, maxY);
+        pos.z = Mathf.Clamp(pos.z, minZ, maxZ);
         transform.position = pos;
     }
 }
