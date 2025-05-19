@@ -14,7 +14,7 @@ public class BuildingSelector : MonoBehaviour
 
     void Update()
     {
-        //Building Selector
+        // Building selector
         if (!isMoving && Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject())
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -30,12 +30,12 @@ public class BuildingSelector : MonoBehaviour
                 }
             }
         }
-        //Building move mechanic
+        // Building move mechanic
         if (isMoving && selectedBuilding != null)
         {
             // Move building to mouse position
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            Plane groundPlane = new Plane(Vector3.up, Vector3.zero); // Ground at y = 0
+            Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
 
             Vector3 mouseWorldPos = selectedBuilding.transform.position;
 
@@ -48,38 +48,30 @@ public class BuildingSelector : MonoBehaviour
             // Check if placement is valid at this position
             bool canPlace = CanPlaceBuilding(mouseWorldPos);
 
-            // Visual feedback: color the building green or red
+            // Colour the building green or red
             var rend = selectedBuilding.GetComponent<Renderer>();
             if (rend != null)
             {
                 rend.material.color = (canPlace ? Color.green : Color.red);
             }
 
-            // If left-click, attempt to finalize placement
+            // Attempt to finalize placement
             if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject())
             {
-                if (canPlace)
+                if (!canPlace)
                 {
-                    // Place building: restore NoBuild layer and exit move mode
-                    selectedBuilding.layer = originalLayerMask;
-                    isMoving = false;
-                }
-                else
-                {
-                    // Invalid position: snap back to original
                     selectedBuilding.transform.position = originalPosition;
-                    selectedBuilding.layer = originalLayerMask;
-                    isMoving = false;
-                }
-                // Show the UI panel again (or clear selection)
-                buildingOptionsPanel.SetActive(true);
+                } 
+                selectedBuilding.layer = originalLayerMask;
+                isMoving = false;
+                Deselect();
             }
         }
     }
 
     void SelectBuilding(GameObject building)
     {
-        // Prevent buildings not restoring colour when selecting a building while another one is selected
+        // Prevent buildings not restoring colour when selecting a building while another one is already selected
         Deselect();
 
         selectedBuilding = building;
@@ -108,7 +100,7 @@ public class BuildingSelector : MonoBehaviour
                 rend.material.color = originalColor; // restore original colour
             }
         }
-
+        
         selectedBuilding = null;
         buildingOptionsPanel.SetActive(false);
     }
