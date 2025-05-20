@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class Flood : MonoBehaviour
@@ -7,7 +8,7 @@ public class Flood : MonoBehaviour
     public float duration = 2f;
     public float delayBeforeFlood = 30f;
 
-    public TiltCity tiltCity;
+    public Transform cameraTransform;
 
     private bool hasFlooded = false;
     private bool hasDrained = false;
@@ -34,11 +35,22 @@ public class Flood : MonoBehaviour
     public void TriggerFlood()
     {
         LeanTween.moveY(waterPlane.gameObject, floodHeight, duration).setEaseInOutSine();
+        StartCoroutine(FloodEvent());
+    }
+
+    private IEnumerator FloodEvent()
+    {
+        LeanTween.moveY(waterPlane.gameObject, floodHeight, duration).setEaseInOutSine();
+
+        // Wait for the flood animation to finish to prevent accidentally clearing it before it appears
+        yield return new WaitForSeconds(duration);
+
         hasFlooded = true;
     }
 
     public void DrainFlood()
     {
+        Debug.Log("Drained");
         LeanTween.moveY(waterPlane.gameObject, -1f, duration).setEaseInOutSine();
         hasDrained = true;
     }
@@ -46,9 +58,10 @@ public class Flood : MonoBehaviour
     void DetectMouseShake()
     {
         Vector3 currentMousePosition = Input.mousePosition;
-        float speed = (currentMousePosition - lastMousePosition).magnitude / Time.deltaTime;
+        float movement = (currentMousePosition - lastMousePosition).magnitude;
+        float speed = movement / Time.deltaTime;
 
-        if (speed > shakeThreshold)
+        if (speed > shakeThreshold && movement > 50f)
         {
             shakeCount++;
             shakeTimer = 0.3f;
@@ -62,8 +75,8 @@ public class Flood : MonoBehaviour
 
             if (shakeCount >= 3 && !hasDrained)
             {
+                LeanTween.rotateZ(cameraTransform.gameObject, 10f, 1f).setLoopPingPong(1);
                 DrainFlood();
-                tiltCity.Tilt();
             }
         }
         else
