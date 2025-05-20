@@ -10,12 +10,12 @@ public class Dragging : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     private RectTransform dragTransform;
     public LayerMask noBuildLayer;
 
-    //When first clicking the draggable icon
+    // When first clicking the draggable icon
     public void OnBeginDrag(PointerEventData eventData)
     {
         var canvas = GetComponentInParent<Canvas>();
         if (canvas == null) {
-            Debug.LogError("Canvas not found");
+            Debug.LogError("No canvas found");
             return;
         }
 
@@ -31,11 +31,11 @@ public class Dragging : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
         dragTransform = dragIcon.GetComponent<RectTransform>();
     }
 
-    //While dragging the icon
+    // While dragging the icon
     public void OnDrag(PointerEventData eventData)
     {
         dragTransform.position = eventData.position;
-        //Check if placement is valid or invalid
+        // Check if placement is valid or invalid
         Ray ray = Camera.main.ScreenPointToRay(eventData.position);
         if (Physics.Raycast(ray, out RaycastHit hit))
         {
@@ -102,6 +102,6 @@ public class Dragging : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
 
         Destroy(temp);
 
-        return hits.Length == 0; // True if no blockers
+        return hits.Length == 0; // True if there's nothing blocking its placement
     }
 }

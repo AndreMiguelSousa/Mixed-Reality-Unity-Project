@@ -3,11 +3,11 @@ using UnityEngine;
 
 public class Flood : MonoBehaviour
 {
-    public Transform waterPlane;
     public float floodHeight = 1f;
     public float duration = 2f;
     public float delayBeforeFlood = 30f;
 
+    public Transform waterPlane;
     public Transform cameraTransform;
 
     private bool hasFlooded = false;

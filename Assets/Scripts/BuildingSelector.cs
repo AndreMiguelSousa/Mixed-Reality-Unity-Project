@@ -35,7 +35,7 @@ public class BuildingSelector : MonoBehaviour
         {
             // Move building to mouse position
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
+            Plane groundPlane = new(Vector3.up, Vector3.zero);
 
             Vector3 mouseWorldPos = selectedBuilding.transform.position;
 
@@ -84,7 +84,7 @@ public class BuildingSelector : MonoBehaviour
         {
             originalMaterial = rend.material;
             originalColor = rend.material.color;
-            rend.material.color = originalColor * 0.7f; // darken it a bit
+            rend.material.color = originalColor * 0.7f; // darken it slightly
         }
 
         buildingOptionsPanel.SetActive(true);
@@ -120,7 +120,7 @@ public class BuildingSelector : MonoBehaviour
         }
         isMoving = true;
         buildingOptionsPanel.SetActive(false);
-        // Prevent building from blocking its own placement with nobuild
+        // Prevent building from blocking its own placement
         selectedBuilding.layer = LayerMask.NameToLayer("Default");
     }
 
@@ -145,7 +145,7 @@ public class BuildingSelector : MonoBehaviour
 
         Destroy(temp);
 
-        return hits.Length == 0; // True if no blockers
+        return hits.Length == 0; // Returns true if there is nothing blocking the placement
     }
 
 }

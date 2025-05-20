@@ -4,7 +4,6 @@ public class CameraMovement : MonoBehaviour
 {
     [Header("Movement Settings")]
     public float moveSpeed = 10f;
-    public float zoomSpeed = 20f;
     public float rotationSpeed = 3f;
     public float pitchMin = 20f;
     public float pitchMax = 80f;
@@ -22,6 +21,7 @@ public class CameraMovement : MonoBehaviour
 
     void Start()
     {
+        //Get camera's current rotation
         Vector3 angles = transform.eulerAngles;
         pitch = angles.x;
         yaw = angles.y;
@@ -30,8 +30,8 @@ public class CameraMovement : MonoBehaviour
     void Update()
     {
         // Movement
-        float horizontal = Input.GetAxisRaw("Horizontal");
-        float vertical = Input.GetAxisRaw("Vertical");
+        float sidewaysMovement = Input.GetAxisRaw("Horizontal");
+        float forwardBackMovement = Input.GetAxisRaw("Vertical");
 
         // Vertical Movement
         float verticalUpDown = 0f;
@@ -40,14 +40,14 @@ public class CameraMovement : MonoBehaviour
 
         Vector3 forward = transform.forward;
         Vector3 right = transform.right;
-        Vector3 up = Vector3.up;
+        Vector3 up = Vector3.up;    
 
         forward.y = 0;
         right.y = 0;
         forward.Normalize();
         right.Normalize();
 
-        Vector3 direction = (forward * vertical + right * horizontal + up * verticalUpDown).normalized;
+        Vector3 direction = (forward * forwardBackMovement + right * sidewaysMovement + up * verticalUpDown).normalized;
         transform.position += direction * moveSpeed * Time.deltaTime;
 
         // Mouse Rotation
